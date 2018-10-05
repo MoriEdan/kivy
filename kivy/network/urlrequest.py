@@ -62,6 +62,7 @@ from threading import Thread
 from json import loads
 from time import sleep
 from kivy.compat import PY2
+from kivy.config import Config
 
 if PY2:
     from httplib import HTTPConnection
@@ -177,7 +178,7 @@ class UrlRequest(Thread):
                  req_body=None, req_headers=None, chunk_size=8192,
                  timeout=None, method=None, decode=True, debug=False,
                  file_path=None, ca_file=None, verify=True, proxy_host=None,
-                 proxy_port=None, proxy_headers=None):
+                 proxy_port=None, proxy_headers=None, user_agent=None):
         super(UrlRequest, self).__init__()
         self._queue = deque()
         self._trigger_result = Clock.create_trigger(self._dispatch_result, 0)
@@ -224,6 +225,7 @@ class UrlRequest(Thread):
         url = self.url
         req_body = self.req_body
         req_headers = self.req_headers
+        req_headers.setdefault('User-Agent', Config.get('network', 'useragent'))
 
         try:
             result, resp = self._fetch_url(url, req_body, req_headers, q)
